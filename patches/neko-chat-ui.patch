@@ -1,0 +1,185 @@
+diff --git a/client/src/plugins/chat/Chat.tsx b/client/src/plugins/chat/Chat.tsx
+index 956bc8e..dc883e9 100644
+--- a/client/src/plugins/chat/Chat.tsx
++++ b/client/src/plugins/chat/Chat.tsx
+@@ -1,7 +1,6 @@
+ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+ import { useStore } from 'zustand'
+ import { useShallow } from 'zustand/react/shallow'
+-import { useTranslation } from 'react-i18next'
+ import { useActions } from '@/state/actions'
+ import { selectMuted } from '@/state/app'
+ import { useNeko } from '@/state/provider'
+@@ -15,6 +14,7 @@ import { sendChat } from './actions'
+ import { loadEmoji } from './emoji'
+ import { Markdown } from './Markdown'
+ import { EmojiPicker } from './EmojiPicker'
++import { answerText, pendingQuestion, questionOf, visibleText } from './hermes'
+ 
+ const time = (d: Date) =>
+   d.toDateString() === new Date().toDateString()
+@@ -26,7 +26,6 @@ const MAX_MESSAGE = 512
+ const line = 'flex flex-1 flex-row flex-nowrap overflow-hidden pt-2.5 pr-[5px] pl-2.5 wrap-break-word select-text'
+ 
+ export function Chat() {
+-  const { t } = useTranslation()
+   const neko = useNeko()
+   const { client } = neko
+   const actions = useActions()
+@@ -39,6 +38,10 @@ export function Chat() {
+   )
+   const [text, setText] = useState('')
+   const [picker, setPicker] = useState(false)
++  const [answered, setAnswered] = useState<number | null>(null)
++  const pending = pendingQuestion(lines)
++  const pendingSeq = lines.filter((m) => m.name === 'Hermes' && questionOf(m.content)?.id === pending?.id).slice(-1)[0]?.seq
++  const active = pending && pendingSeq !== answered ? pending : null
+   const history = useRef<HTMLUListElement>(null)
+   const input = useRef<HTMLTextAreaElement>(null)
+ 
+@@ -52,7 +55,9 @@ export function Chat() {
+     if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing) return
+     e.preventDefault()
+     if (!text.trim()) return
+-    sendChat(neko, text)
++    const replying = active && !text.trim().startsWith('/')
++    sendChat(neko, replying ? answerText(text, active.id) : text)
++    if (replying) setAnswered(pendingSeq ?? null)
+     setText('')
+   }
+ 
+@@ -79,6 +84,7 @@ export function Chat() {
+         ref={history}
+       >
+         {lines.map((m, i) => {
++          const question = nameOf(m) === 'Hermes' ? questionOf(m.content) : null
+           const bulk = i > 0 && lines[i - 1].id === m.id && lines[i - 1].type === 'text'
+           return m.type === 'text' ? (
+             <li key={m.seq} className={cn(line, 'text-[16px]', bulk ? 'pt-0' : 'pt-[15px]')} data-testid="chat-message">
+@@ -105,7 +111,35 @@ export function Chat() {
+                     </span>
+                   </div>
+                 )}
+-                <Markdown source={m.content} />
++                <Markdown source={visibleText(m.content)} />
++                {question && (
++                  <div className="my-2 flex flex-wrap gap-2" role="group" aria-label="Answer Hermes">
++                    {question.choices.map((choice, index) => (
++                      <button
++                        key={`${question.id}-${index}`}
++                        type="button"
++                        className="rounded border border-white/20 bg-white/10 px-3 py-2 text-left text-sm text-text-normal hover:bg-white/20 disabled:cursor-default disabled:opacity-40"
++                        disabled={!enabled || muted || active?.id !== question.id || m.seq !== pendingSeq}
++                        onClick={() => {
++                          sendChat(neko, answerText(choice, question.id, index))
++                          setAnswered(m.seq)
++                        }}
++                      >
++                        {choice}
++                      </button>
++                    ))}
++                    {question.kind === 'clarify' && (
++                      <button
++                        type="button"
++                        className="rounded border border-white/20 px-3 py-2 text-sm text-text-normal disabled:opacity-40"
++                        disabled={active?.id !== question.id || m.seq !== pendingSeq}
++                        onClick={() => input.current?.focus()}
++                      >
++                        Type my own answer
++                      </button>
++                    )}
++                  </div>
++                )}
+               </div>
+             </li>
+           ) : (
+@@ -125,8 +159,8 @@ export function Chat() {
+               ref={input}
+               className="m-[5px] flex-1 resize-none border-0 bg-transparent text-text-normal caret-text-normal outline-hidden selection:bg-text-link placeholder:text-text-muted [scrollbar-color:var(--color-background-tertiary)_transparent] [scrollbar-width:thin]"
+               data-testid="chat-input"
+-              placeholder={t('chat:send_a_message')}
+-              maxLength={MAX_MESSAGE}
++              placeholder={active ? 'Type your answer…' : 'Message Hermes…'}
++              maxLength={active ? MAX_MESSAGE - answerText('', active.id).length : MAX_MESSAGE}
+               value={text}
+               onChange={(e) => setText(e.target.value)}
+               onKeyDown={onKeyDown}
+--- /dev/null
++++ b/client/src/plugins/chat/hermes.ts
+@@ -0,0 +1,38 @@
++export interface HermesQuestion {
++  id: string
++  kind: 'approval' | 'clarify'
++  choices: string[]
++}
++
++export function questionOf(text: string): HermesQuestion | null {
++  const match = text.match(/<!--hermes-question:(\{.*\})-->$/s)
++  if (!match) return null
++  try {
++    const value: unknown = JSON.parse(match[1])
++    if (!value || typeof value !== 'object') return null
++    const q = value as Partial<HermesQuestion>
++    if (typeof q.id !== 'string' || q.id.length > 160 || !['approval', 'clarify'].includes(q.kind ?? '')) return null
++    if (!Array.isArray(q.choices) || q.choices.length > 6 || !q.choices.every((c) => typeof c === 'string')) return null
++    return q as HermesQuestion
++  } catch {
++    return null
++  }
++}
++
++export const visibleText = (text: string) => text.replace(/\n?<!--hermes-(?:question|answer):\{.*\}-->$/s, '')
++
++export function answerText(text: string, id: string, choice?: number): string {
++  const suffix = `\n<!--hermes-answer:${JSON.stringify({ id, ...(choice === undefined ? {} : { choice }) })}-->`
++  return text.slice(0, 512 - suffix.length) + suffix
++}
++
++export function pendingQuestion(lines: { name: string; content: string }[]): HermesQuestion | null {
++  let pending: HermesQuestion | null = null
++  for (const line of lines) {
++    if (line.name !== 'Hermes') continue
++    const question = questionOf(line.content)
++    if (question) pending = question
++    else if (line.content === 'Response sent to Hermes.' || line.content.startsWith('Stopped the active request.') || line.content.startsWith('Started a new conversation.')) pending = null
++  }
++  return pending
++}
+--- /dev/null
++++ b/client/src/plugins/chat/hermes.test.ts
+@@ -0,0 +1,35 @@
++import { describe, expect, it } from 'vitest'
++import { answerText, pendingQuestion, questionOf, visibleText } from './hermes'
++
++const question = { id: 'question-1', kind: 'clarify', choices: ['Python', 'TypeScript'] }
++const card = `Choose an option.\n<!--hermes-question:${JSON.stringify(question)}-->`
++
++describe('Hermes chat answers', () => {
++  it('reads a question and keeps metadata out of the displayed text', () => {
++    expect(questionOf(card)).toEqual(question)
++    expect(visibleText(card)).toBe('Choose an option.')
++  })
++  it('binds a selected choice to its question', () => {
++    const answer = answerText('Python', question.id, 0)
++    expect(answer).toContain('"choice":0')
++    expect(answer).toContain('"id":"question-1"')
++    expect(visibleText(answer)).toBe('Python')
++  })
++  it('accepts a custom answer within the transport limit', () => {
++    const answer = answerText('x'.repeat(512), question.id)
++    expect(answer.length).toBeLessThanOrEqual(512)
++    expect(answer).not.toContain('"choice"')
++  })
++  it('ignores malformed question metadata', () => {
++    expect(questionOf('<!--hermes-question:{oops}-->')).toBeNull()
++    expect(questionOf('<!--hermes-question:{"id":"a","choices":"bad"}-->')).toBeNull()
++  })
++  it('disables answered questions and selects the newest question', () => {
++    const lines = [{ name: 'Hermes', content: card }]
++    expect(pendingQuestion(lines)?.id).toBe(question.id)
++    lines.push({ name: 'Hermes', content: 'Response sent to Hermes.' })
++    expect(pendingQuestion(lines)).toBeNull()
++    lines.push({ name: 'Mark', content: card })
++    expect(pendingQuestion(lines)).toBeNull()
++  })
++})

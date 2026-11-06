@@ -218,3 +218,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+.vercel
+.env*
+
+# Node dependencies
+node_modules/
+
+# Shared application authentication code
+!/lib/
+!/lib/auth.mjs

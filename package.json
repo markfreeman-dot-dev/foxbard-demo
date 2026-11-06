@@ -1,0 +1,28 @@
+{
+  "name": "foxbard-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "probe:desktop": "node --env-file-if-exists=.env.local --env-file-if-exists=.env.probe scripts/desktop-probe.mjs",
+    "probe:media": "node --env-file-if-exists=.env.probe scripts/media-probe.mjs",
+    "probe:input": "node --env-file-if-exists=.env.local --env-file-if-exists=.env.probe scripts/input-probe.mjs",
+    "probe:chat": "node --env-file-if-exists=.env.probe scripts/chat-probe.mjs",
+    "probe:clarify": "node --env-file-if-exists=.env.probe scripts/clarify-probe.mjs",
+    "test": "node --test tests/gate.test.mjs"
+  },
+  "devDependencies": {
+    "@roamhq/wrtc": "0.10.0",
+    "ws": "8.22.1"
+  },
+  "overrides": {
+    "@vercel/cli-config": {
+      "zod": "4.6.7"
+    }
+  },
+  "dependencies": {
+    "@vercel/sandbox": "3.9.1"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}
