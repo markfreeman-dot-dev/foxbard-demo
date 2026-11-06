@@ -1,3 +1,5 @@
+# THIS DEMO IS NOT A SECURE ENVIRONMENT - DO NOT ENTER SENSITIVE INFORMATION
+
 # Foxbard shared desktop
 
 The demo runs on Vercel at **https://foxbard-demo-mark-5769s-projects.vercel.app**. Enter a display name and the shared demo password, then choose **Open desktop**. Everyone joins the same KDE workspace. Type directly in Neko chat to talk to Hermes; choose a suggested answer or type your own response when Hermes asks a question.
