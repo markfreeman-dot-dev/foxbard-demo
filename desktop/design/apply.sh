@@ -13,4 +13,4 @@ for key in font menuFont toolBarFont smallestReadableFont fixed; do
 done
 plasma-apply-colorscheme Foxbard
 plasma-apply-desktoptheme foxbard
-plasma-apply-wallpaperimage /opt/foxbard/design/wallpaper.svg
+plasma-apply-wallpaperimage /opt/foxbard/design/wallpaper-paper.svg
