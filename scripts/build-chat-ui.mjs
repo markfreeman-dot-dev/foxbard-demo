@@ -13,7 +13,7 @@ const work = await mkdtemp(join(tmpdir(), 'foxbard-client-'));
 const run = (cmd, args, cwd = work) => execFileSync(cmd, args, { cwd, stdio: 'inherit' });
 const archive = execFileSync('git', ['-C', resolve(source), 'archive', revision], { maxBuffer: 128 * 1024 * 1024 });
 execFileSync('tar', ['-xf', '-', '-C', work], { input: archive });
-for (const patch of ['neko-chat-ui.patch', 'neko-foxbard-design.patch']) {
+for (const patch of ['neko-chat-ui.patch', 'neko-foxbard-design.patch', 'neko-model-selectors.patch']) {
   execFileSync('git', ['apply', '-'], { cwd: work, input: await readFile(join(root, 'patches', patch)) });
 }
 const client = join(work, 'client');

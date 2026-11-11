@@ -13,13 +13,13 @@ import socket as unix_socket
 from urllib.parse import quote
 
 import httpx
-from dotenv import dotenv_values
 import websockets
 
 HOME = Path.home()
 CONFIG = HOME / '.config/foxbard/neko.json'
 STATE = HOME / '.local/state/foxbard'
 HERMES = HOME / '.local/bin/hermes'
+MODELS = HOME / '.config/foxbard/models.json'
 HELP = ('Type a request here to talk to Foxbard and control this shared KDE desktop. '
         'Commands: /status, /stop, /new, /approve, /deny. '
         'Everyone in this room can see requests and replies.')
@@ -62,8 +62,15 @@ def desktop_environment():
     return env
 
 
-def has_key():
-    return bool(dotenv_values(HOME / '.hermes/.env').get('OPENROUTER_API_KEY'))
+def has_subscription():
+    try:
+        auth = json.loads((HOME / '.hermes/auth.json').read_text())
+        entries = auth.get('credential_pool', {}).get('openai-codex', [])
+        if any(isinstance(entry, dict) and entry.get('access_token') for entry in entries):
+            return True
+        return bool(auth.get('providers', {}).get('openai-codex', {}).get('tokens', {}).get('access_token'))
+    except (OSError, ValueError, AttributeError, TypeError):
+        return False
 
 
 class Bridge:
@@ -76,7 +83,9 @@ class Bridge:
         self.questions = []
         STATE.mkdir(parents=True, exist_ok=True, mode=0o700)
         with suppress(OSError, ValueError):
-            self.session_id = json.loads((STATE / 'session.json').read_text()).get('id')
+            session = json.loads((STATE / 'session.json').read_text())
+            if session.get('provider') == 'openai-codex':
+                self.session_id = session.get('id')
 
     async def send(self, event, payload):
         await self.ws.send(json.dumps({'event': event, 'payload': payload}))
@@ -112,7 +121,7 @@ class Bridge:
                 os.killpg(process.pid, signal.SIGKILL)
             await process.wait()
 
-    async def run(self, prompt):
+    async def run(self, prompt, options=None):
         try:
             args = [str(HERMES), '--run-module', 'foxbard_runner']
             with (STATE / 'agent.log').open('w') as log:
@@ -121,7 +130,7 @@ class Bridge:
                     *args, stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE,
                     stderr=log, env=desktop_environment(), start_new_session=True,
                     limit=4 * 1024 * 1024)
-                self.process.stdin.write((json.dumps({'prompt': CONTEXT + prompt, 'session_id': self.session_id}) + '\n').encode())
+                self.process.stdin.write((json.dumps({'prompt': CONTEXT + prompt, 'session_id': self.session_id, 'options': options}) + '\n').encode())
                 await self.process.stdin.drain()
                 result = None
                 async with asyncio.timeout(270):
@@ -132,7 +141,7 @@ class Bridge:
                             continue
                         if event.get('type') == 'session':
                             self.session_id = event['id']
-                            (STATE / 'session.json').write_text(json.dumps({'id': self.session_id}))
+                            (STATE / 'session.json').write_text(json.dumps({'id': self.session_id, 'provider': 'openai-codex'}))
                             os.chmod(STATE / 'session.json', 0o600)
                         if event.get('type') in ('approval', 'clarify'):
                             if self.pending and self.pending['id'] != event['id']:
@@ -150,13 +159,13 @@ class Bridge:
                     self.session_id = result['session_id']
                     path = STATE / 'session.json'
                     temporary = STATE / 'session.json.tmp'
-                    temporary.write_text(json.dumps({'id': self.session_id}))
+                    temporary.write_text(json.dumps({'id': self.session_id, 'provider': 'openai-codex'}))
                     os.chmod(temporary, 0o600)
                     temporary.replace(path)
                 if result and result.get('text'):
                     await self.say(result['text'])
                 elif self.process.returncode:
-                    await self.say('Foxbard could not complete this request. Check ~/.local/state/foxbard/agent.log in Konsole for the cause. Use hermes model to check your OpenRouter configuration, or /new if a previous session cannot resume.')
+                    await self.say('Foxbard could not complete this request. Check ~/.local/state/foxbard/agent.log in Konsole for the cause. Use hermes model to check your ChatGPT subscription configuration, or /new if a previous session cannot resume.')
                 else:
                     await self.say('Foxbard finished without a text reply. Check the desktop for changes.')
         except asyncio.CancelledError:
@@ -231,6 +240,21 @@ class Bridge:
             await self.show_question()
 
     async def handle(self, text):
+        options = None
+        selection = re.search(r'\n?<!--foxbard-options:(\{.*\})-->$', text, re.S)
+        if selection:
+            try:
+                options = json.loads(selection.group(1))
+                catalog = json.loads(MODELS.read_text())
+                if not isinstance(options, dict) or set(options) != {'model', 'effort'}:
+                    raise ValueError('Invalid selection')
+                model = next((item for item in catalog['models'] if item['id'] == options['model']), None)
+                if not model or options['effort'] not in model['efforts']:
+                    raise ValueError('Unsupported selection')
+            except (OSError, ValueError, KeyError, TypeError):
+                await self.say('That model or effort is unavailable. Refresh the page and choose again.')
+                return
+            text = text[:selection.start()]
         metadata = None
         marker = re.search(r'\n?<!--hermes-answer:(\{.*\})-->$', text, re.S)
         if marker:
@@ -254,8 +278,8 @@ class Bridge:
             await self.say(HELP)
         elif command == 'status':
             status = 'waiting for your response' if self.pending else ('working' if self.task and not self.task.done() else 'idle')
-            key = 'OpenRouter key saved' if has_key() else 'OpenRouter key missing; run foxbard-openrouter in Konsole'
-            await self.say(f'Foxbard is {status}; {key}. Desktop: KDE :99.0.')
+            credentials = 'OpenAI subscription credentials saved' if has_subscription() else 'OpenAI subscription sign-in missing; run hermes model in Konsole'
+            await self.say(f'Foxbard is {status}; {credentials}. Desktop: KDE :99.0.')
             await self.show_question()
         elif command == 'stop':
             stopped = await self.stop()
@@ -270,11 +294,11 @@ class Bridge:
             self.session_id = None
             (STATE / 'session.json').unlink(missing_ok=True)
             await self.say('Started a new conversation. Desktop files and windows are unchanged.')
-        elif not has_key():
-            await self.say('Enter your OpenRouter API key in the desktop first: open Konsole and run foxbard-openrouter. Then resend this request.')
+        elif not has_subscription():
+            await self.say('Sign in to your ChatGPT subscription first: open Konsole, run hermes model, and choose ChatGPT / Codex Subscription. Then resend this request.')
         else:
             await self.say('Starting. Use /stop to interrupt.')
-            self.task = asyncio.create_task(self.run(prompt))
+            self.task = asyncio.create_task(self.run(prompt, options) if options else self.run(prompt))
 
     async def connect(self):
         config = json.loads(CONFIG.read_text())

@@ -10,6 +10,33 @@ spec = importlib.util.spec_from_file_location('bridge', Path(__file__).parents[1
 bridge = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(bridge)
 
+class SubscriptionTests(unittest.TestCase):
+    def test_saved_subscription_credentials(self):
+        with tempfile.TemporaryDirectory() as directory, patch.object(bridge, 'HOME', Path(directory)):
+            folder = Path(directory) / '.hermes'
+            folder.mkdir()
+            path = folder / 'auth.json'
+            self.assertFalse(bridge.has_subscription())
+            (folder / '.env').write_text('OPENROUTER_API_KEY=old-key')
+            self.assertFalse(bridge.has_subscription())
+            for invalid in ('{', 'null', '[]', '{"credential_pool": null}', '{}'):
+                path.write_text(invalid)
+                self.assertFalse(bridge.has_subscription())
+            for auth in (
+                {'credential_pool': {'openai-codex': [{'access_token': 'test-token'}]}},
+                {'providers': {'openai-codex': {'tokens': {'access_token': 'test-token'}}}},
+            ):
+                path.write_text(json.dumps(auth))
+                self.assertTrue(bridge.has_subscription())
+
+    def test_previous_provider_session_is_not_resumed(self):
+        with tempfile.TemporaryDirectory() as directory, patch.object(bridge, 'STATE', Path(directory)):
+            path = Path(directory) / 'session.json'
+            path.write_text(json.dumps({'id': 'old-session'}))
+            self.assertIsNone(bridge.Bridge().session_id)
+            path.write_text(json.dumps({'id': 'subscription-session', 'provider': 'openai-codex'}))
+            self.assertEqual(bridge.Bridge().session_id, 'subscription-session')
+
 class ChatTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -29,21 +56,42 @@ class ChatTests(unittest.IsolatedAsyncioTestCase):
         received = []
         async def run(prompt): received.append(prompt)
         self.bot.run = run
-        with patch.object(bridge, 'has_key', return_value=True):
+        with patch.object(bridge, 'has_subscription', return_value=True):
             await self.bot.handle('Open the terminal')
             await self.bot.task
         self.assertEqual(received, ['Open the terminal'])
+
+    async def test_model_selection_reaches_runner(self):
+        path = Path(self.temp.name) / 'models.json'
+        path.write_text(json.dumps({'models': [{'id': 'gpt-6-sol', 'efforts': ['low', 'medium']}]}))
+        received = []
+        async def run(prompt, options): received.append((prompt, options))
+        self.bot.run = run
+        with patch.object(bridge, 'MODELS', path), patch.object(bridge, 'has_subscription', return_value=True):
+            await self.bot.handle('Hello\n<!--foxbard-options:{"model":"gpt-6-sol","effort":"low"}-->')
+            await self.bot.task
+        self.assertEqual(received, [('Hello', {'model': 'gpt-6-sol', 'effort': 'low'})])
+
+    async def test_unavailable_model_or_effort_is_rejected(self):
+        path = Path(self.temp.name) / 'models.json'
+        path.write_text(json.dumps({'models': [{'id': 'gpt-6-sol', 'efforts': ['low']}]}))
+        for options in ({'model': 'other', 'effort': 'low'}, {'model': 'gpt-6-sol', 'effort': 'max'}, []):
+            with patch.object(bridge, 'MODELS', path):
+                payload = json.dumps(options) if isinstance(options, dict) else '{"unexpected":true}'
+                await self.bot.handle('Hello\n<!--foxbard-options:' + payload + '-->')
+            self.assertIsNone(self.bot.task)
+            self.assertIn('unavailable', self.sent[-1])
 
     async def test_empty_message_is_ignored(self):
         await self.bot.handle('  ')
         self.assertIsNone(self.bot.task)
         self.assertEqual(self.sent, [])
 
-    async def test_missing_key_does_not_start_agent(self):
-        with patch.object(bridge, 'has_key', return_value=False):
+    async def test_missing_subscription_does_not_start_agent(self):
+        with patch.object(bridge, 'has_subscription', return_value=False):
             await self.bot.handle('@hermes open a terminal')
         self.assertIsNone(self.bot.task)
-        self.assertIn('OpenRouter API key', self.sent[0])
+        self.assertIn('ChatGPT subscription', self.sent[0])
 
     async def test_busy_and_stop(self):
         stopped = asyncio.Event()

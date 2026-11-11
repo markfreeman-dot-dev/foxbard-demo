@@ -1,4 +1,4 @@
-"""Run one Neko request through Hermes's gateway, with live chat controls."""
+"""Run one Foxbard request through Hermes's gateway, with live chat controls."""
 import asyncio
 from contextlib import suppress
 import json
@@ -34,12 +34,19 @@ async def main():
             snapshot = await client.rpc('session.resume', session_id=request['session_id'])
         else:
             snapshot = await client.rpc('session.create', request_id=uuid.uuid4().hex, source='cli',
-                                        provider='openrouter', toolsets=['terminal', 'file', 'computer_use', 'clarify'],
+                                        provider='openai-codex', toolsets=['terminal', 'file', 'computer_use', 'clarify'],
                                         max_turns=25, cwd=str(Path.home()), client_env=shell_client_env())
         sid = snapshot['stored_session_id']
         emit({'type': 'session', 'id': sid})
         emitter = StreamJsonEmitter(session_id=sid)
         view = ChatView(client, snapshot, quiet=True, emitter=emitter)
+        if request.get('options'):
+            options = request['options']
+            payload = {'model': options['model'], 'provider': 'openai-codex', 'reasoning': options['effort']}
+            await view.mutations.apply(client, view.session_id, 'model', payload)
+            await view.adopt(await client.rpc('session.resume', session_id=view.session_id))
+            view.mutations.acknowledge(view.session_id, 'model', payload)
+            emit({'type': 'selection', 'model': options['model'], 'effort': options['effort']})
         if view.unknown_admissions():
             raise RuntimeError('Previous request has an unknown outcome. Use /new after checking the desktop.')
         renderer = asyncio.create_task(view.render())
