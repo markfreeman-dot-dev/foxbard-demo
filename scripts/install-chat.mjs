@@ -7,11 +7,13 @@ const files = await Promise.all([
   ['desktop/foxbard_runner.py', '/tmp/foxbard_runner.py'],
   ['desktop/openrouter-setup.py', '/tmp/openrouter-setup.py'],
   ['desktop/developer.conf', '/tmp/developer.conf'],
+  ['public/design-system/logo/mark-white.svg', '/tmp/foxbard-mark.svg'],
 ].map(async ([source,path])=>({path,content:await readFile(source)})));
 await box.writeFiles(files);
 await box.writeFiles([{path:'/tmp/foxbard-neko.json',content:Buffer.from(JSON.stringify({password:process.env.PROBE_PASSWORD})),mode:0o600}]);
 const script = `set -e
-install -d -m 755 /opt/foxbard
+install -d -m 755 /opt/foxbard/design/logo
+install -m 644 /tmp/foxbard-mark.svg /opt/foxbard/design/logo/mark-white.svg
 install -m 755 /tmp/hermes-chat.py /opt/foxbard/hermes-chat.py
 install -o neko -g neko -m 644 /tmp/foxbard_runner.py /home/neko/.hermes/hermes-agent/foxbard_runner.py
 install -o neko -g neko -m 755 /tmp/openrouter-setup.py /home/neko/.local/bin/foxbard-openrouter
@@ -24,7 +26,7 @@ cat > /home/neko/Desktop/OpenRouter.desktop <<'DESKTOP'
 [Desktop Entry]
 Type=Application
 Name=Set up OpenRouter
-Comment=Enter your API key and choose a Hermes model
+Comment=Enter your API key and choose a model for Foxbard
 Exec=konsole --separate -e /home/neko/.local/bin/foxbard-openrouter
 Icon=preferences-desktop-user-password
 Terminal=false
@@ -32,10 +34,10 @@ DESKTOP
 cat > /home/neko/Desktop/Hermes.desktop <<'DESKTOP'
 [Desktop Entry]
 Type=Application
-Name=Hermes Agent
-Comment=Chat with Hermes in a terminal
+Name=Foxbard
+Comment=Chat with Foxbard in a terminal
 Exec=konsole --separate -e /home/neko/.local/bin/hermes
-Icon=utilities-terminal
+Icon=/opt/foxbard/design/logo/mark-white.svg
 Terminal=false
 DESKTOP
 cp /usr/share/applications/org.kde.konsole.desktop /home/neko/Desktop/Terminal.desktop
