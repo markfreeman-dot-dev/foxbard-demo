@@ -1,0 +1,9 @@
+{
+  "KPlugin": {
+    "Id": "foxbard",
+    "Name": "Foxbard",
+    "Description": "Foxbard desktop colors",
+    "Version": "0.3.0"
+  },
+  "X-Plasma-API": "5.0"
+}

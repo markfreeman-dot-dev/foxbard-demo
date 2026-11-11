@@ -1,31 +1,44 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-palette="lime-ink" data-support="blue">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="dark">
   <title>Foxbard</title>
+  <link rel="icon" href="/design-system/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/fonts/fonts.css">
+  <link rel="stylesheet" href="/design-system/tokens/tokens.css">
+  <link rel="stylesheet" href="/design-system/components/foxbard.css">
   <link rel="stylesheet" href="/style.css">
   <script src="/app.js" defer></script>
 </head>
-<body>
+<body class="fb-page">
+  <header class="site-header">
+    <div class="fb-wordmark">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="fb-name">Foxbard</span>
+    </div>
+  </header>
   <main>
-    <h1>Foxbard</h1>
-    <section class="card">
+    <div class="intro">
+      <span class="brand-mark hero-mark" aria-hidden="true"></span>
+      <h1 class="fb-h1">Foxbard: <span class="fb-ac">AI that pays attention.</span></h1>
+    </div>
+    <section class="card fb-panel" aria-label="Shared desktop">
       <form id="login" aria-label="Log in">
         <label for="name">Name</label>
         <input id="name" name="name" autocomplete="nickname" maxlength="40" required>
         <label for="password">Password</label>
         <input id="password" name="password" type="password" autocomplete="current-password" required>
-        <button type="submit">Log in</button>
+        <button class="fb-btn" type="submit">Log in</button>
       </form>
       <div id="workspace" hidden>
-        <div class="status"><span class="dot"></span><span id="state">Checking desktop…</span></div>
+        <div class="status"><span class="dot" aria-hidden="true"></span><span id="state">Checking desktop…</span></div>
         <h2 id="welcome">Welcome back</h2>
-        <button id="launch">Open desktop <span aria-hidden="true">↗</span></button>
+        <button class="fb-btn" id="launch">Open desktop <span aria-hidden="true">↗</span></button>
         <div class="actions">
-          <button class="secondary" id="stop">Stop shared desktop</button>
-          <button class="secondary" id="logout">Log out</button>
+          <button class="fb-btn is-ghost secondary" id="stop">Stop shared desktop</button>
+          <button class="fb-btn is-ghost secondary" id="logout">Log out</button>
         </div>
         <p class="note">Stopping disconnects everyone. Save open work first.</p>
       </div>

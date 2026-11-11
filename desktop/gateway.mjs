@@ -31,7 +31,7 @@ function clearSession(item) {
 async function body(req) {
   let data = ''; for await (const chunk of req) { data += chunk; if (data.length > 8192) throw new Error('Request too large.'); } return data;
 }
-const banner = `<div style="position:fixed;bottom:8px;left:8px;z-index:2147483647;background:#17232e;border:1px solid #5b7181;border-radius:8px;padding:6px 10px;font:12px system-ui;display:flex;gap:12px"><a style="color:#c5f3d8" href="${config.entryUrl}">Demo / Reconnect</a><a style="color:#e8edf2" href="/gate/logout">Log out</a></div><script src="/gate/client.js"></script>`;
+const banner = `<div style="position:fixed;bottom:8px;left:8px;z-index:2147483647;background:#161618;border:1px solid #4A4A4E;border-radius:6px;padding:6px 10px;font:12px "Geist Mono",monospace;display:flex;gap:12px"><a style="color:#F4F4F2" href="${config.entryUrl}">Demo / Reconnect</a><a style="color:#F4F4F2" href="/gate/logout">Log out</a></div><script src="/gate/client.js"></script>`;
 const server = http.createServer(async (req, res) => {
   try {
     const path = new URL(req.url, 'http://localhost').pathname;

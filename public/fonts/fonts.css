@@ -1,0 +1,51 @@
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 800;
+  font-stretch: expanded;
+  font-display: swap;
+  src: url(/fonts/archivo-800.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/geist-mono-400.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/fonts/geist-mono-500.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/fonts/geist-mono-600.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/hanken-grotesk-400.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/fonts/hanken-grotesk-600.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Supreme';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/design-system/fonts/f-supreme-700.woff2') format('woff2');
+}

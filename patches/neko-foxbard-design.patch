@@ -1,0 +1,675 @@
+diff --git a/client/index.html b/client/index.html
+--- a/client/index.html
++++ b/client/index.html
+@@ -1,16 +1,19 @@
+ <!doctype html>
+-<html lang="en">
++<html lang="en" data-theme="dark" data-palette="lime-ink" data-support="blue">
+   <head>
+     <meta charset="utf-8" />
+     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+-    <title>n.eko</title>
++    <title>Foxbard</title>
++    <link rel="stylesheet" href="/fonts/fonts.css" />
++    <link rel="stylesheet" href="/design-system/tokens/tokens.css" />
+     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
++    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+     <link rel="manifest" href="site.webmanifest" />
+-    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#19bd9c" />
+-    <meta name="msapplication-TileColor" content="#19bd9c" />
+-    <meta name="theme-color" content="#19bd9c" />
++    <link rel="mask-icon" href="safari-pinned-tab.svg" color="#0B0B0C" />
++    <meta name="msapplication-TileColor" content="#0B0B0C" />
++    <meta name="theme-color" content="#0B0B0C" />
+     <!-- iOS: video does not start unless the container has a size before the app renders -->
+     <style>
+       .video-container {
+@@ -22,7 +25,7 @@
+   <body>
+     <noscript>
+       <strong
+-        >We're sorry but n.eko doesn't work properly without JavaScript enabled. Please enable it to continue.</strong
++        >Foxbard requires JavaScript. Enable it to continue.</strong
+       >
+     </noscript>
+     <div id="root"></div>
+diff --git a/client/src/app/App.tsx b/client/src/app/App.tsx
+--- a/client/src/app/App.tsx
++++ b/client/src/app/App.tsx
+@@ -6,7 +6,7 @@
+ import { useSlot } from '@/plugins'
+ import { WebRTCTransport } from '@m1k1o/neko'
+ import { cn } from '@/lib/utils'
+-import logo from '@/assets/images/logo.svg'
++import logo from '@/assets/images/foxbard.svg'
+ import { Dialog } from '@/components/Dialog'
+ import { Toaster } from '@/components/ui/sonner'
+ import { Header } from '@/layout/Header'
+@@ -36,10 +36,8 @@
+       <div className="absolute inset-0 flex items-center justify-center">
+         <div className="w-[320px] rounded-[5px] bg-background-secondary p-2.5">
+           <div className="flex w-full items-center justify-center">
+-            <img src={logo} alt="n.eko" className="mr-2.5 h-[90px]" />
+-            <span className="text-[30px] leading-14">
+-              <b className="font-black">n</b>.eko
+-            </span>
++            <img src={logo} alt="" className="mr-2.5 h-[48px]" />
++            <span className="foxbard-wordmark">FOXBARD</span>
+           </div>
+           <div className="flex flex-col">
+             <span className="block text-center leading-7.5 uppercase">{t('unsupported')}</span>
+@@ -51,15 +49,15 @@
+ 
+   const expanded = !videoOnly && side
+   return (
+-    // every icon filled, as in the v2 client (phosphor defaults to the outline `regular` weight)
+-    <IconContext.Provider value={{ weight: 'fill' }}>
++    // Use line icons throughout the interface.
++    <IconContext.Provider value={{ weight: 'regular' }}>
+       <div
+         id="neko"
+         className="tablet:relative tablet:max-h-none tablet:flex-col absolute inset-0 flex max-h-[100vh] max-w-[100vw]"
+       >
+         <main
+           className={cn(
+-            'flex min-w-[360px] max-w-full grow flex-col overflow-auto',
++            'flex min-w-0 max-w-full grow flex-col overflow-auto',
+             expanded ? 'tablet:portrait:h-[40vh] tablet:landscape:h-screen' : 'tablet:h-screen',
+           )}
+         >
+diff --git a/client/src/app/ErrorBoundary.tsx b/client/src/app/ErrorBoundary.tsx
+--- a/client/src/app/ErrorBoundary.tsx
++++ b/client/src/app/ErrorBoundary.tsx
+@@ -1,6 +1,6 @@
+ import { Component, type ReactNode } from 'react'
+ import { Button } from '@/components/ui/button'
+-import logo from '@/assets/images/logo.svg'
++import logo from '@/assets/images/foxbard.svg'
+ 
+ // a render bug should not leave a blank page
+ export class ErrorBoundary extends Component<{ children: ReactNode }, { error?: Error }> {
+@@ -16,10 +16,8 @@
+       <div className="absolute inset-0 flex items-center justify-center">
+         <div className="w-[320px] rounded-[5px] bg-background-secondary p-2.5">
+           <div className="flex w-full items-center justify-center">
+-            <img src={logo} alt="n.eko" className="mr-2.5 h-[90px]" />
+-            <span className="text-[30px] leading-14">
+-              <b className="font-black">n</b>.eko
+-            </span>
++            <img src={logo} alt="" className="mr-2.5 h-[48px]" />
++            <span className="foxbard-wordmark">FOXBARD</span>
+           </div>
+           <div className="flex flex-col">
+             <span className="block text-center leading-7.5 uppercase">
+diff --git a/client/src/assets/images/foxbard.svg b/client/src/assets/images/foxbard.svg
+new file mode 100644
+--- /dev/null
++++ b/client/src/assets/images/foxbard.svg
+@@ -0,0 +1 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 783 786"><title>Foxbard Labs mark (trace of Nov 10 26 raster, not designer vector)</title><path fill="#FFFFFF" fill-rule="evenodd" d="M479.4,0.0 L482.5,0.0 L484.9,2.5 L491.2,163.5 L492.0,196.5 L490.5,199.0 L243.5,127.9 L238.9,125.5 L239.5,123.1 L255.0,107.1 L283.1,82.0 L313.0,60.7 L342.5,43.8 L376.0,28.6 L405.9,18.0 L443.5,7.5 Z M523.8,21.5 L543.5,24.1 L562.5,28.3 L614.0,41.2 L617.9,44.0 L530.5,191.6 L529.3,190.0 L525.2,88.5 L523.0,33.0 Z M187.0,160.0 L191.5,160.0 L219.0,168.5 L779.5,349.0 L782.5,351.0 L782.6,352.5 L779.3,365.5 L772.8,380.5 L766.6,391.0 L749.0,411.5 L724.5,431.1 L692.0,450.0 L673.0,454.7 L530.0,480.7 L490.5,491.3 L463.0,501.9 L437.0,514.8 L413.0,529.8 L394.0,544.0 L370.5,565.8 L349.5,590.1 L332.5,614.5 L317.6,641.0 L305.0,669.5 L296.5,694.1 L287.9,727.0 L282.2,762.0 L280.0,764.2 L91.1,282.5 L92.6,278.5 L109.6,252.5 L135.0,217.6 L162.5,185.3 Z M69.3,319.5 L70.7,319.5 L72.8,323.5 L81.3,345.0 L253.2,785.5 L251.3,785.5 L241.1,777.0 L0.0,574.1 L1.3,548.5 L5.7,514.5 L12.0,480.1 L20.5,445.2 L39.7,386.0 L54.5,350.3 Z"/></svg>
+diff --git a/client/src/components/Avatar.tsx b/client/src/components/Avatar.tsx
+--- a/client/src/components/Avatar.tsx
++++ b/client/src/components/Avatar.tsx
+@@ -1,4 +1,6 @@
+ import { useEffect, useState } from 'react'
++import { displayName, isAssistant } from '@/lib/branding'
++import fox from '@/assets/images/foxbard.svg'
+ 
+ export function Avatar({ seed, avatar, size }: { seed: string; avatar?: string; size: number }) {
+   const [failed, setFailed] = useState(false)
+@@ -10,24 +12,16 @@
+     if (u.protocol === 'http:' || u.protocol === 'https:') url = u.toString()
+   } catch {}
+ 
+-  // deterministic pastel color from the name, same formula as the legacy client
+-  let a = 0,
+-    b = 0,
+-    c = 0
+-  for (let i = 0; i < seed.length; i++) {
+-    a += seed.charCodeAt(i) * 3
+-    b += seed.charCodeAt(i) * 5
+-    c += seed.charCodeAt(i) * 7
+-  }
+-  const bg = `rgb(${128 + (a % 128)},${128 + (b % 128)},${128 + (c % 128)})`
+ 
+   return (
+     <div
+-      className="inline-block overflow-hidden rounded-full bg-white text-center text-black select-none"
+-      style={{ width: size, height: size, lineHeight: size + 'px', fontSize: size / 2, backgroundColor: bg }}
++      className="inline-block overflow-hidden rounded-full bg-background-accent text-center text-text-normal select-none"
++      style={{ width: size, height: size, lineHeight: size + 'px', fontSize: size / 2 }}
+     >
+-      {url && !failed ? (
+-        <img src={url} alt={seed} className="block h-full w-full object-cover" onError={() => setFailed(true)} />
++      {isAssistant(seed) ? (
++        <img src={fox} alt="Foxbard" className="h-full w-full p-[18%]" />
++      ) : url && !failed ? (
++        <img src={url} alt={displayName(seed)} className="block h-full w-full object-cover grayscale" onError={() => setFailed(true)} />
+       ) : (
+         seed.substring(0, 2).toUpperCase()
+       )}
+diff --git a/client/src/components/ui/button.tsx b/client/src/components/ui/button.tsx
+--- a/client/src/components/ui/button.tsx
++++ b/client/src/components/ui/button.tsx
+@@ -9,13 +9,13 @@
+     variants: {
+       variant: {
+         // connect, settings, about, the broadcast controls
+-        primary: 'rounded-[5px] bg-style-primary p-1 leading-7.5 font-bold text-text-normal uppercase',
++        primary: 'rounded-[6px] bg-text-normal p-1 leading-7.5 font-bold text-background-tertiary uppercase',
+         // the OAuth login
+         outline:
+-          'rounded-[5px] border border-style-primary bg-background-tertiary p-1 leading-7.5 font-bold text-text-normal uppercase',
++          'rounded-[6px] border border-style-primary bg-background-tertiary p-1 leading-7.5 font-bold text-text-normal uppercase',
+         // the dialog's confirm and cancel
+-        confirm: 'rounded-[0.25em] bg-background-tertiary px-[2em] py-[0.625em] text-[1.0625em] text-white',
+-        cancel: 'rounded-[0.25em] bg-background-floating px-[2em] py-[0.625em] text-[1.0625em] text-white',
++        confirm: 'rounded-[6px] bg-background-tertiary px-[2em] py-[0.625em] text-[1.0625em] text-white',
++        cancel: 'rounded-[6px] bg-background-floating px-[2em] py-[0.625em] text-[1.0625em] text-white',
+       },
+     },
+     defaultVariants: { variant: 'primary' },
+diff --git a/client/src/features/about/About.tsx b/client/src/features/about/About.tsx
+--- a/client/src/features/about/About.tsx
++++ b/client/src/features/about/About.tsx
+@@ -3,7 +3,7 @@
+ import { useApp } from '@/state/provider'
+ import { Dialog, DialogPortal, DialogOverlay, DialogContent, DialogTitle } from '@/components/ui/dialog'
+ import { Button } from '@/components/ui/button'
+-import logo from '@/assets/images/logo.svg'
++import logo from '@/assets/images/foxbard.svg'
+ 
+ export function About() {
+   const { t } = useTranslation()
+@@ -18,15 +18,13 @@
+           aria-describedby={undefined}
+           data-testid="about"
+         >
+-          <DialogTitle className="sr-only">About n.eko</DialogTitle>
++          <DialogTitle className="sr-only">About Foxbard</DialogTitle>
+           <div className="px-10 py-7.5 text-center text-interactive-normal">
+             <div className="mb-[15px] flex items-center justify-center">
+-              <img src={logo} alt="n.eko" className="mr-2.5 h-[70px]" />
+-              <span className="text-[30px] leading-14">
+-                <b>n</b>.eko
+-              </span>
++              <img src={logo} alt="" className="mr-2.5 h-[48px]" />
++              <span className="foxbard-wordmark">FOXBARD</span>
+             </div>
+-            <p className="mb-[15px]">A self hosted virtual browser that runs in docker and uses WebRTC.</p>
++            <p className="mb-[15px]">Foxbard shared desktop.</p>
+             <p className="mb-[15px]">
+               <a
+                 className="mx-2.5 text-text-link"
+@@ -34,7 +32,7 @@
+                 target="_blank"
+                 rel="noopener noreferrer"
+               >
+-                <GithubLogoIcon className="inline size-3.5 align-[-0.125em]" /> m1k1o/neko
++                <GithubLogoIcon className="inline size-3.5 align-[-0.125em]" /> Source code
+               </a>
+               <a
+                 className="mx-2.5 text-text-link"
+@@ -47,7 +45,7 @@
+             </p>
+             <p className="mb-[15px] text-[12px] text-text-muted">client {__APP_VERSION__}</p>
+             <Button
+-              className="px-6 py-2 leading-none font-normal text-white normal-case"
++              className="px-6 py-2 leading-none font-normal normal-case"
+               data-testid="about-close"
+               onClick={close}
+             >
+diff --git a/client/src/features/connect/Connect.tsx b/client/src/features/connect/Connect.tsx
+--- a/client/src/features/connect/Connect.tsx
++++ b/client/src/features/connect/Connect.tsx
+@@ -8,7 +8,7 @@
+ import { useNeko } from '@/state/provider'
+ import { i18n } from '@/i18n'
+ import { Button } from '@/components/ui/button'
+-import logo from '@/assets/images/logo.svg'
++import logo from '@/assets/images/foxbard.svg'
+ 
+ const input =
+   'my-[5px] rounded-[5px] border-0 bg-background-tertiary px-2 py-1.5 leading-5 text-text-normal selection:bg-text-link placeholder:text-[#757575]'
+@@ -71,10 +71,8 @@
+     <div className="fixed inset-0 flex items-center justify-center bg-background-floating/80" data-testid="connect">
+       <div className="w-[320px] rounded-[5px] bg-background-secondary p-2.5">
+         <div className="flex w-full cursor-pointer items-center justify-center">
+-          <img src={logo} alt="n.eko" className="mr-2.5 h-[90px]" />
+-          <span className="text-[30px] leading-14">
+-            <b className="font-black">n</b>.eko
+-          </span>
++          <img src={logo} alt="" className="mr-2.5 h-[48px]" />
++          <span className="foxbard-wordmark">FOXBARD</span>
+         </div>
+         {connecting ? (
+           <div className="relative mx-auto h-[90px] w-[90px]">
+diff --git a/client/src/features/members/MemberMenu.tsx b/client/src/features/members/MemberMenu.tsx
+--- a/client/src/features/members/MemberMenu.tsx
++++ b/client/src/features/members/MemberMenu.tsx
+@@ -1,3 +1,4 @@
++import { displayName } from '@/lib/branding'
+ import { useStore } from 'zustand'
+ import { useShallow } from 'zustand/react/shallow'
+ import { selectControlling, selectIsAdmin, type Session } from '@m1k1o/neko'
+@@ -50,7 +51,7 @@
+   )
+   const ignored = useStore(app, (s) => !!id && !!s.ignored[id])
+   const open = !!menu && !!m
+-  const n = m?.profile.name ?? ''
++  const n = displayName(m?.profile.name ?? '')
+   const isHost = id === hostId
+   const danger = 'text-[#f04747]'
+ 
+diff --git a/client/src/features/members/Members.tsx b/client/src/features/members/Members.tsx
+--- a/client/src/features/members/Members.tsx
++++ b/client/src/features/members/Members.tsx
+@@ -1,3 +1,4 @@
++import { displayName } from '@/lib/branding'
+ import { useStore } from 'zustand'
+ import { useShallow } from 'zustand/react/shallow'
+ import { selectSession } from '@m1k1o/neko'
+@@ -56,13 +57,13 @@
+           {Object.values(sessions)
+             .filter((m) => m.id !== sessionId && m.state.is_connected)
+             .map((m, i) => (
+-              <li key={m.id} className={cn('inline-block', i === 0 && others)} title={m.profile.name}>
++              <li key={m.id} className={cn('inline-block', i === 0 && others)} title={displayName(m.profile.name)}>
+                 <div
+                   className={member}
+                   data-testid="member"
+                   data-host={m.id === hostId || undefined}
+                   tabIndex={0}
+-                  aria-label={m.profile.name}
++                  aria-label={displayName(m.profile.name)}
+                   aria-haspopup="menu"
+                   onContextMenu={(e) => actions.openMenu(e, m.id)}
+                   onKeyDown={(e) => menuKey(neko, e, m.id)}
+diff --git a/client/src/features/room-menu/RoomMenu.tsx b/client/src/features/room-menu/RoomMenu.tsx
+--- a/client/src/features/room-menu/RoomMenu.tsx
++++ b/client/src/features/room-menu/RoomMenu.tsx
+@@ -14,7 +14,7 @@
+   return (
+     <ul className="ml-2.5 self-center">
+       <li className="mr-2.5 inline-block align-middle">
+-        <IconButton label="About n.eko" data-testid="about-open" onClick={() => app.setState({ about: true })}>
++        <IconButton label="About Foxbard" data-testid="about-open" onClick={() => app.setState({ about: true })}>
+           <QuestionIcon className="size-6" />
+         </IconButton>
+       </li>
+diff --git a/client/src/index.css b/client/src/index.css
+--- a/client/src/index.css
++++ b/client/src/index.css
+@@ -1,33 +1,33 @@
+-/* Tailwind v4 and the design tokens (README, "Design"): preflight, theme, utilities, the global
+-   rules of the page and the responsive variants of the layout. The font is the system stack
+-   (Tailwind's --font-sans). */
++/* Foxbard colors and fonts; the existing responsive layout stays in place. */
+ @import 'tailwindcss';
+ 
+ @theme {
+-  /* the tokens of src/design/_variables.scss, same values: text-text-normal, bg-background-primary, ... */
+-  --color-text-normal: #dcddde;
+-  --color-text-muted: #72767d;
+-  --color-text-link: #00b0f4;
+-
+-  --color-interactive-normal: #b9bbbe;
+-  --color-interactive-hover: #dcddde;
+-  --color-interactive-muted: #4f545c;
+-
+-  --color-background-primary: #36393f;
+-  --color-background-secondary: #2f3136;
+-  --color-background-tertiary: #202225;
+-  --color-background-accent: #4f545c;
+-  --color-background-floating: #18191c;
+-  --color-background-modifier-hover: rgba(79, 84, 92, 0.16);
+-  --color-background-modifier-active: rgba(79, 84, 92, 0.24);
+-  --color-background-modifier-selected: rgba(79, 84, 92, 0.32);
+-  --color-background-modifier-accent: hsla(0, 0%, 100%, 0.06);
++  --font-sans: var(--fb-font-family-body);
++  --font-mono: var(--fb-font-family-mono);
++  /* Map existing component tokens to the Foxbard palette. */
++  --color-text-normal: var(--fb-text);
++  --color-text-muted: var(--fb-text-muted);
++  --color-text-link: var(--fb-support);
++
++  --color-interactive-normal: var(--fb-text-2);
++  --color-interactive-hover: var(--fb-text);
++  --color-interactive-muted: var(--fb-text-muted);
++
++  --color-background-primary: var(--fb-surface);
++  --color-background-secondary: var(--fb-background);
++  --color-background-tertiary: var(--fb-background);
++  --color-background-accent: var(--fb-line-strong);
++  --color-background-floating: var(--fb-surface);
++  --color-background-modifier-hover: var(--fb-line);
++  --color-background-modifier-active: var(--fb-line-strong);
++  --color-background-modifier-selected: var(--fb-line);
++  --color-background-modifier-accent: var(--fb-line);
+ 
+   --shadow-elevation-low: 0 1px 0 rgba(4, 4, 5, 0.2), 0 1.5px 0 rgba(6, 6, 7, 0.05), 0 2px 0 rgba(4, 4, 5, 0.05);
+   --shadow-elevation-high: 0 8px 16px rgba(0, 0, 0, 0.24);
+ 
+-  --color-style-primary: #19bd9c;
+-  --color-style-error: #d32f2f;
++  --color-style-primary: var(--fb-text);
++  --color-style-error: var(--fb-error);
+ 
+   /* $text-size: the size of the UI text (text-ui); $text-family became Tailwind's --font-sans */
+   --text-ui: 14px;
+@@ -184,3 +184,33 @@
+     outline: 2px solid var(--color-style-primary);
+   }
+ }
++
++.foxbard-wordmark {
++  font-family: var(--fb-font-family-wordmark);
++  font-weight: var(--fb-font-weight-wordmark);
++  font-stretch: 125%;
++  letter-spacing: var(--fb-font-tracking-wordmark);
++  font-size: 18px;
++  line-height: 1;
++  white-space: nowrap;
++}
++[data-testid="header"], [data-testid="tabs"] { border-bottom: 1px solid var(--fb-line); }
++[data-testid="side"] { border-left: 1px solid var(--fb-line); }
++[role="dialog"], [role="menu"], [data-testid="connect"] > div { border: 1px solid var(--fb-line-strong); border-radius: var(--fb-radius-card); }
++[role="tab"][data-state="active"] { color: var(--fb-text); border-bottom: 2px solid var(--fb-accent-mark); }
++[role="dialog"] h2 { font-family: var(--fb-font-family-display); }
++.foxbard-message-start { border-top: 1px solid var(--fb-line); margin-top: 6px; }
++.foxbard-message-start:first-child { border-top: 0; margin-top: 0; }
++.foxbard-choice { background: transparent; color: var(--fb-text); border-color: var(--fb-line-strong); border-radius: var(--fb-radius-card); cursor: pointer; }
++.foxbard-choice:hover:not(:disabled) { background: var(--fb-line); }
++.foxbard-choice[aria-pressed="true"] { background: var(--fb-text); color: var(--fb-background); border-color: var(--fb-text); }
++.foxbard-choice:disabled { cursor: default; opacity: .55; }
++.foxbard-choice[aria-pressed="true"]:disabled { opacity: 1; }
++button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline-color: var(--fb-accent-mark); outline-offset: 2px; }
++::selection { background: var(--fb-support); color: var(--fb-background); }
++@media (max-width: 480px) {
++  [data-testid="header"] a { margin-left: 10px; width: auto; min-width: 0; }
++  [data-testid="header"] img { height: 24px; margin-right: 6px; }
++  .foxbard-wordmark { font-size: 14px; }
++  [data-testid="about"] { max-width: calc(100vw - 24px); }
++}
+diff --git a/client/src/layout/Header.tsx b/client/src/layout/Header.tsx
+--- a/client/src/layout/Header.tsx
++++ b/client/src/layout/Header.tsx
+@@ -11,7 +11,7 @@
+ import { IconButton } from '@/components/IconButton'
+ import { useSlot } from '@/plugins'
+ import { EachHook } from '@/components/EachHook'
+-import logo from '@/assets/images/logo.svg'
++import logo from '@/assets/images/foxbard.svg'
+ 
+ const zero = () => 0
+ 
+@@ -52,15 +52,13 @@
+     <div className="flex flex-1 flex-row items-center">
+       <a
+         href="https://github.com/m1k1o/neko"
+-        title="Github repository"
++        title="Desktop source code"
+         target="_blank"
+         rel="noreferrer"
+         className="ml-5 flex w-[150px] flex-1 items-center justify-start"
+       >
+-        <img src={logo} alt="n.eko" className="mr-2.5 block h-7.5" />
+-        <span className="text-[30px] leading-7.5">
+-          <b className="font-black">n</b>.eko
+-        </span>
++        <img src={logo} alt="" className="mr-2.5 block h-7.5" />
++        <span className="foxbard-wordmark">FOXBARD</span>
+       </a>
+       <ul className="mr-2.5 whitespace-nowrap">
+         {lock('control', <MouseIcon className="size-4" />)}
+diff --git a/client/src/lib/branding.ts b/client/src/lib/branding.ts
+new file mode 100644
+--- /dev/null
++++ b/client/src/lib/branding.ts
+@@ -0,0 +1,3 @@
++// Keep transport names unchanged; map the assistant name only for display.
++export const displayName = (name: string) => name === 'Hermes' ? 'Foxbard' : name
++export const isAssistant = (name: string) => name === 'Hermes' || name === 'Foxbard'
+diff --git a/client/src/plugins/chat/Chat.tsx b/client/src/plugins/chat/Chat.tsx
+--- a/client/src/plugins/chat/Chat.tsx
++++ b/client/src/plugins/chat/Chat.tsx
+@@ -1,3 +1,4 @@
++import { displayName } from '@/lib/branding'
+ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+ import { useStore } from 'zustand'
+ import { useShallow } from 'zustand/react/shallow'
+@@ -38,6 +39,7 @@
+   )
+   const [text, setText] = useState('')
+   const [picker, setPicker] = useState(false)
++  const [selected, setSelected] = useState<Record<number, number>>({})
+   const [answered, setAnswered] = useState<number | null>(null)
+   const pending = pendingQuestion(lines)
+   const pendingSeq = lines.filter((m) => m.name === 'Hermes' && questionOf(m.content)?.id === pending?.id).slice(-1)[0]?.seq
+@@ -87,7 +89,7 @@
+           const question = nameOf(m) === 'Hermes' ? questionOf(m.content) : null
+           const bulk = i > 0 && lines[i - 1].id === m.id && lines[i - 1].type === 'text'
+           return m.type === 'text' ? (
+-            <li key={m.seq} className={cn(line, 'text-[16px]', bulk ? 'pt-0' : 'pt-[15px]')} data-testid="chat-message">
++            <li key={m.seq} className={cn(line, 'text-[16px]', !bulk && 'foxbard-message-start', bulk ? 'pt-0' : 'pt-[15px]')} data-testid="chat-message">
+               <div
+                 className={cn(
+                   'mr-2.5 h-10 w-10 shrink-0 grow-0 overflow-hidden rounded-full bg-style-primary',
+@@ -101,7 +103,7 @@
+               <div className="flex min-w-0 flex-1 flex-col wrap-break-word">
+                 {!bulk && (
+                   <div className="mb-[3px] block w-full cursor-default">
+-                    <span className="inline-block font-medium text-text-normal">{nameOf(m)}</span>
++                    <span className="inline-block font-medium text-text-normal">{displayName(nameOf(m))}</span>
+                     {/* the legacy 0.7rem and 0.3rem at a 14px root */}
+                     <span
+                       className="ml-[4.2px] inline-block text-[9.8px] leading-3 font-medium text-text-muted first-letter:uppercase"
+@@ -113,16 +115,18 @@
+                 )}
+                 <Markdown source={visibleText(m.content)} />
+                 {question && (
+-                  <div className="my-2 flex flex-wrap gap-2" role="group" aria-label="Answer Hermes">
++                  <div className="my-2 flex flex-wrap gap-2" role="group" aria-label="Answer Foxbard">
+                     {question.choices.map((choice, index) => (
+                       <button
+                         key={`${question.id}-${index}`}
+                         type="button"
+-                        className="rounded border border-white/20 bg-white/10 px-3 py-2 text-left text-sm text-text-normal hover:bg-white/20 disabled:cursor-default disabled:opacity-40"
++                        className="foxbard-choice rounded border px-3 py-2 text-left text-sm"
++                        aria-pressed={selected[m.seq] === index}
+                         disabled={!enabled || muted || active?.id !== question.id || m.seq !== pendingSeq}
+                         onClick={() => {
+                           sendChat(neko, answerText(choice, question.id, index))
+                           setAnswered(m.seq)
++                          setSelected((choices) => ({ ...choices, [m.seq]: index }))
+                         }}
+                       >
+                         {choice}
+@@ -131,7 +135,7 @@
+                     {question.kind === 'clarify' && (
+                       <button
+                         type="button"
+-                        className="rounded border border-white/20 px-3 py-2 text-sm text-text-normal disabled:opacity-40"
++                        className="foxbard-choice rounded border px-3 py-2 text-sm"
+                         disabled={active?.id !== question.id || m.seq !== pendingSeq}
+                         onClick={() => input.current?.focus()}
+                       >
+@@ -145,7 +149,7 @@
+           ) : (
+             <li key={m.seq} className={cn(line, 'cursor-default text-text-muted')} data-testid="chat-event">
+               <div className="inline-block min-w-0 align-baseline leading-5 wrap-break-word" title={time(m.created)}>
+-                <strong className="font-semibold">{m.name}</strong> {m.content}
++                <strong className="font-semibold">{displayName(m.name)}</strong> {m.content}
+               </div>
+             </li>
+           )
+@@ -159,7 +163,7 @@
+               ref={input}
+               className="m-[5px] flex-1 resize-none border-0 bg-transparent text-text-normal caret-text-normal outline-hidden selection:bg-text-link placeholder:text-text-muted [scrollbar-color:var(--color-background-tertiary)_transparent] [scrollbar-width:thin]"
+               data-testid="chat-input"
+-              placeholder={active ? 'Type your answer…' : 'Message Hermes…'}
++              placeholder={active ? 'Type your answer…' : 'Message Foxbard…'}
+               maxLength={active ? MAX_MESSAGE - answerText('', active.id).length : MAX_MESSAGE}
+               value={text}
+               onChange={(e) => setText(e.target.value)}
+diff --git a/client/src/plugins/chat/EmojiPicker.tsx b/client/src/plugins/chat/EmojiPicker.tsx
+--- a/client/src/plugins/chat/EmojiPicker.tsx
++++ b/client/src/plugins/chat/EmojiPicker.tsx
+@@ -4,7 +4,7 @@
+ import {
+   AppleLogoIcon,
+   CarIcon,
+-  CatIcon,
++  StickerIcon,
+   ClockIcon,
+   FlagIcon,
+   type Icon,
+@@ -27,7 +27,7 @@
+ // the icon of each group's tab at the bottom of the picker
+ const GROUP_ICON: Record<string, Icon> = {
+   recent: ClockIcon,
+-  neko: CatIcon,
++  neko: StickerIcon,
+   emotion: SmileyIcon,
+   people: UsersIcon,
+   nature: PawPrintIcon,
+@@ -121,7 +121,7 @@
+             {groups.map((g, gi) => (
+               <li key={g.id} ref={(el) => void (groupEls.current[gi] = el)}>
+                 <span className="sticky top-[-5px] z-2 block w-full bg-background-secondary/90 py-2 text-[12px] font-medium uppercase">
+-                  {g.name}
++                  {g.id === 'neko' ? 'Custom' : g.name}
+                 </span>
+                 <ul className="flex flex-row flex-wrap">{g.list.map((n) => item(n, `${g.id}-${n}`))}</ul>
+               </li>
+@@ -146,7 +146,7 @@
+             return (
+               <li key={g.id} className="flex grow">
+                 <IconButton
+-                  label={g.name}
++                  label={g.id === 'neko' ? 'Custom' : g.name}
+                   className={cn(
+                     'box-content h-[27px] w-full',
+                     active === gi && !q && 'border-b-[3px] border-style-primary',
+diff --git a/client/src/plugins/chat/hermes.ts b/client/src/plugins/chat/hermes.ts
+--- a/client/src/plugins/chat/hermes.ts
++++ b/client/src/plugins/chat/hermes.ts
+@@ -32,7 +32,7 @@
+     if (line.name !== 'Hermes') continue
+     const question = questionOf(line.content)
+     if (question) pending = question
+-    else if (line.content === 'Response sent to Hermes.' || line.content.startsWith('Stopped the active request.') || line.content.startsWith('Started a new conversation.')) pending = null
++    else if ((line.content === 'Response sent to Hermes.' || line.content === 'Response sent to Foxbard.') || line.content.startsWith('Stopped the active request.') || line.content.startsWith('Started a new conversation.')) pending = null
+   }
+   return pending
+ }
+diff --git a/client/src/plugins/chat/index.ts b/client/src/plugins/chat/index.ts
+--- a/client/src/plugins/chat/index.ts
++++ b/client/src/plugins/chat/index.ts
+@@ -1,3 +1,4 @@
++import { displayName } from '@/lib/branding'
+ import { useStore } from 'zustand'
+ import { selectIsAdmin } from '@m1k1o/neko'
+ import { ChatIcon } from '@phosphor-icons/react'
+@@ -30,8 +31,8 @@
+         const which = muted ? 'unmute' : 'mute'
+         ask(
+           neko.app,
+-          t(`chat:confirm.${which}_title`, { name: m.profile.name }),
+-          t(`chat:confirm.${which}_text`, { name: m.profile.name }),
++          t(`chat:confirm.${which}_title`, { name: displayName(m.profile.name) }),
++          t(`chat:confirm.${which}_text`, { name: displayName(m.profile.name) }),
+         ).then((ok) => ok && mute(neko, m.id, !muted))
+       },
+     },
+@@ -82,7 +83,7 @@
+           id: '',
+           name: by,
+           type: 'event',
+-          content: t(now ? 'chat:unmuted' : 'chat:muted', { name: name(client, id) }),
++          content: t(now ? 'chat:unmuted' : 'chat:muted', { name: displayName(name(client, id)) }),
+           created: new Date(),
+         })
+       }
+diff --git a/client/src/state/actions.ts b/client/src/state/actions.ts
+--- a/client/src/state/actions.ts
++++ b/client/src/state/actions.ts
+@@ -1,3 +1,4 @@
++import { displayName } from '@/lib/branding'
+ // what the GUI can do to the room; `actions(neko)` is the set bound to one instance, `useActions()`
+ // the same in a component
+ import { isLocked, name, scoped, type LockResource } from './app'
+@@ -27,7 +28,7 @@
+       client.request()
+       // server only notifies the host; tell the requester what happened
+       if (host && !client.state.settings.implicit_hosting)
+-        toast(t('notifications.controls_has', { name: name(client, host) }), t('notifications.controls_has_alt'))
++        toast(t('notifications.controls_has', { name: displayName(name(client, host)) }), t('notifications.controls_has_alt'))
+     },
+ 
+     sendEmote: (emote: string) => sendEmote(neko, emote),
+@@ -49,7 +50,7 @@
+     // they may log straight back in. A softer kick is POST /api/sessions/{id}/disconnect (the same
+     // session can reconnect). The v2 IP ban lived in the legacy layer and has no v3 counterpart.
+     async kick(id: string) {
+-      const who = name(client, id)
++      const who = displayName(name(client, id))
+       if (await api(neko, 'DELETE', `/sessions/${encodeURIComponent(id)}`))
+         line(neko, t('you'), t('notifications.kicked', { name: who }))
+     },
+diff --git a/client/src/state/events.ts b/client/src/state/events.ts
+--- a/client/src/state/events.ts
++++ b/client/src/state/events.ts
+@@ -1,3 +1,4 @@
++import { displayName } from '@/lib/branding'
+ // event wiring: turn v3 events into event lines (shown by the chat) and toasts
+ import type { Settings } from '@m1k1o/neko'
+ import { isLocked, name, type LockResource, type NekoApp } from './app'
+@@ -26,7 +27,7 @@
+       lastHost = client.state.control.host_id
+       lastSettings = { ...client.state.settings, plugins: { ...client.state.settings.plugins } }
+       for (const [sid, sess] of Object.entries(client.state.sessions))
+-        known[sid] = { connected: sess.state.is_connected, name: sess.profile.name }
++        known[sid] = { connected: sess.state.is_connected, name: displayName(sess.profile.name) }
+       event(neko, id, t('notifications.connected', { name: '' }))
+     },
+   )
+@@ -38,7 +39,7 @@
+     if (now !== !!known[id]?.connected && id !== client.state.session_id) {
+       event(neko, id, t(now ? 'notifications.connected' : 'notifications.disconnected', { name: '' }))
+     }
+-    known[id] = { connected: now, name: sess?.profile.name ?? known[id]?.name ?? '' }
++    known[id] = { connected: now, name: displayName(sess?.profile.name ?? known[id]?.name ?? '') }
+   }
+   ev.on('session.created', onSession)
+   ev.on('session.updated', onSession)
+@@ -51,15 +52,15 @@
+   ev.on('room.control.host', (hasHost, hostID, by) => {
+     const me = client.state.session_id
+     if (hasHost && hostID) {
+-      if (by && by !== hostID) event(neko, by, t('notifications.controls_given', { name: name(client, hostID) }))
++      if (by && by !== hostID) event(neko, by, t('notifications.controls_given', { name: displayName(name(client, hostID)) }))
+       else if (lastHost && lastHost !== hostID)
+-        event(neko, hostID, t('notifications.controls_taken_steal', { name: name(client, lastHost) }))
++        event(neko, hostID, t('notifications.controls_taken_steal', { name: displayName(name(client, lastHost)) }))
+       else event(neko, hostID, t('notifications.controls_taken', { name: '' }))
+       if (hostID === me) toast(t('notifications.controls_taken', { name: t('you') }))
+       else if (lastHost === me) toast(t('notifications.controls_released', { name: t('you') }))
+     } else if (lastHost) {
+       if (by && by !== lastHost)
+-        event(neko, by, t('notifications.controls_released_steal', { name: name(client, lastHost) }))
++        event(neko, by, t('notifications.controls_released_steal', { name: displayName(name(client, lastHost)) }))
+       else event(neko, lastHost, t('notifications.controls_released', { name: '' }))
+       if (lastHost === me) toast(t('notifications.controls_released', { name: t('you') }))
+     }
+@@ -79,7 +80,7 @@
+   )
+ 
+   ev.on('room.control.request', (id) => {
+-    if (!app.getState().ignored[id]) toast(t('notifications.controls_requesting', { name: name(client, id) }))
++    if (!app.getState().ignored[id]) toast(t('notifications.controls_requesting', { name: displayName(name(client, id)) }))
+   })
+ 
+   ev.on('room.screen.updated', (width, height, rate, id) => {

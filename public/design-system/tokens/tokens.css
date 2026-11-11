@@ -1,0 +1,191 @@
+/* GENERATED from tokens/tokens.json by tools/build.py. Do not edit. */
+/* Dark is the default theme. Set data-theme="white" or data-theme="paper" on any ancestor to switch. */
+:root, [data-theme="dark"] {
+  --fb-font-family-wordmark: "Archivo", "Geist", sans-serif;
+  --fb-font-family-display: "Supreme", "Geist", sans-serif;
+  --fb-font-family-body: "Hanken Grotesk", -apple-system, sans-serif;
+  --fb-font-family-mono: "Geist Mono", ui-monospace, monospace;
+  --fb-font-weight-body: 400;
+  --fb-font-weight-strong: 600;
+  --fb-font-weight-display: 700;
+  --fb-font-weight-wordmark: 800;
+  --fb-font-size-deck-eyebrow: 1.35cqw;
+  --fb-font-size-deck-h1: 4.8cqw;
+  --fb-font-size-deck-h2: 3.6cqw;
+  --fb-font-size-deck-h3: 2.3cqw;
+  --fb-font-size-deck-body: 1.6cqw;
+  --fb-font-size-deck-small: 1.4cqw;
+  --fb-font-size-deck-foot: 1.02cqw;
+  --fb-font-size-deck-stat: 9.5cqw;
+  --fb-font-size-web-eyebrow: 12px;
+  --fb-font-size-web-h1: clamp(36px, 6vw, 72px);
+  --fb-font-size-web-h2: clamp(26px, 3.6vw, 44px);
+  --fb-font-size-web-h3: 20px;
+  --fb-font-size-web-lead: 19px;
+  --fb-font-size-web-body: 17px;
+  --fb-font-size-web-small: 14px;
+  --fb-font-size-doc-h1: 44px;
+  --fb-font-size-doc-h2: 30px;
+  --fb-font-size-doc-h3: 22px;
+  --fb-font-size-doc-body: 17px;
+  --fb-font-size-doc-small: 14px;
+  --fb-font-tracking-display: 0em;
+  --fb-font-tracking-label: 0.06em;
+  --fb-font-tracking-wordmark: 0.06em;
+  --fb-space-1: 4px;
+  --fb-space-2: 8px;
+  --fb-space-3: 12px;
+  --fb-space-4: 16px;
+  --fb-space-5: 24px;
+  --fb-space-6: 32px;
+  --fb-space-7: 48px;
+  --fb-space-8: 64px;
+  --fb-radius-card: 6px;
+  --fb-radius-chip: 999px;
+  --fb-radius-none: 0px;
+  --fb-border-card: 1px;
+  --fb-border-rule: 2px;
+  --fb-color-ink: #0B0B0C;
+  --fb-color-ink-raised: #161618;
+  --fb-color-white: #FFFFFF;
+  --fb-color-paper: #F8F5EF;
+  --fb-color-lime: #D4FF2B;
+  --fb-color-olive: #4F6B00;
+  --fb-background: #0B0B0C;
+  --fb-surface: #161618;
+  --fb-text: #F4F4F2;
+  --fb-text-muted: #A3A3A0;
+  --fb-line: #2B2B2E;
+  --fb-line-strong: #4A4A4E;
+  --fb-accent: #D4FF2B;
+  --fb-on-accent: #0B0B0C;
+  --fb-accent-mark: #D4FF2B;
+  --fb-success: #3DD68C;
+  --fb-warning: #F5B94A;
+  --fb-error: #FF6B6B;
+  --fb-info: #7FB2FF;
+  --fb-chart-1: #D4FF2B;
+  --fb-chart-2: #8E8E8A;
+  --fb-chart-3: #7FA2FF;
+  --fb-chart-4: #E5562A;
+  --fb-chart-5: #A88BFF;
+  --fb-text-2: #D9D9D5;
+  --fb-logo-bg: #FFFFFF;
+  --fb-support: #7FA2FF;
+  --fb-mode: dark;
+  color-scheme: dark;
+}
+[data-theme="white"] {
+  --fb-background: #FFFFFF;
+  --fb-surface: #FFFFFF;
+  --fb-text: #0B0B0C;
+  --fb-text-muted: #5E5E5E;
+  --fb-line: #DFDFDF;
+  --fb-line-strong: #B8B8B8;
+  --fb-accent: #D4FF2B;
+  --fb-on-accent: #0B0B0C;
+  --fb-accent-mark: #0B0B0C;
+  --fb-success: #13784A;
+  --fb-warning: #8A5A00;
+  --fb-error: #C4161C;
+  --fb-info: #1F5BD6;
+  --fb-chart-1: #5C7A00;
+  --fb-chart-2: #8A8A86;
+  --fb-chart-3: #2459E6;
+  --fb-chart-4: #E5562A;
+  --fb-chart-5: #6941C6;
+  --fb-text-2: #2B2B2B;
+  --fb-logo-bg: #FFFFFF;
+  --fb-support: #2459E6;
+  --fb-mode: light;
+  color-scheme: light;
+}
+[data-theme="paper"] {
+  --fb-background: #F8F5EF;
+  --fb-surface: #FFFFFF;
+  --fb-text: #0B0B0C;
+  --fb-text-muted: #5F5F5C;
+  --fb-line: #DEDCD5;
+  --fb-line-strong: #B5B2A9;
+  --fb-accent: #D4FF2B;
+  --fb-on-accent: #0B0B0C;
+  --fb-accent-mark: #0B0B0C;
+  --fb-success: #13784A;
+  --fb-warning: #8A5A00;
+  --fb-error: #C4161C;
+  --fb-info: #1F5BD6;
+  --fb-chart-1: #5C7A00;
+  --fb-chart-2: #8A8A86;
+  --fb-chart-3: #2459E6;
+  --fb-chart-4: #E5562A;
+  --fb-chart-5: #6941C6;
+  --fb-text-2: #2B2B29;
+  --fb-logo-bg: #FFFFFF;
+  --fb-header: #F6F3EC;
+  --fb-support: #2459E6;
+  --fb-mode: light;
+  color-scheme: light;
+}
+[data-palette="lime-ink"]:not([data-theme="white"]):not([data-theme="paper"]) {
+  --fb-accent: #D4FF2B;
+  --fb-on-accent: #0B0B0C;
+  --fb-accent-mark: #D4FF2B;
+  --fb-chart-1: #D4FF2B;
+  --fb-chart-3: #7FA2FF;
+  --fb-chart-4: #E5562A;
+  --fb-support: #7FA2FF;
+}
+[data-palette="lime-ink"][data-theme="white"] {
+  --fb-accent: #D4FF2B;
+  --fb-on-accent: #0B0B0C;
+  --fb-accent-mark: #0B0B0C;
+  --fb-chart-1: #5C7A00;
+  --fb-chart-3: #2459E6;
+  --fb-chart-4: #E5562A;
+  --fb-support: #2459E6;
+}
+[data-palette="lime-ink"][data-theme="paper"] {
+  --fb-accent: #D4FF2B;
+  --fb-on-accent: #0B0B0C;
+  --fb-accent-mark: #0B0B0C;
+  --fb-chart-1: #5C7A00;
+  --fb-chart-3: #2459E6;
+  --fb-chart-4: #E5562A;
+  --fb-support: #2459E6;
+}
+[data-support="blue"]:not([data-theme="white"]):not([data-theme="paper"]) {
+  --fb-support: #7FA2FF;
+  --fb-chart-3: #7FA2FF;
+}
+[data-support="blue"][data-theme="white"] {
+  --fb-support: #2459E6;
+  --fb-chart-3: #2459E6;
+}
+[data-support="blue"][data-theme="paper"] {
+  --fb-support: #2459E6;
+  --fb-chart-3: #2459E6;
+}
+[data-support="coral"]:not([data-theme="white"]):not([data-theme="paper"]) {
+  --fb-support: #FF8A70;
+  --fb-chart-3: #FF8A70;
+}
+[data-support="coral"][data-theme="white"] {
+  --fb-support: #B83A2A;
+  --fb-chart-3: #B83A2A;
+}
+[data-support="coral"][data-theme="paper"] {
+  --fb-support: #B83A2A;
+  --fb-chart-3: #B83A2A;
+}
+[data-support="violet"]:not([data-theme="white"]):not([data-theme="paper"]) {
+  --fb-support: #B79BFF;
+  --fb-chart-3: #B79BFF;
+}
+[data-support="violet"][data-theme="white"] {
+  --fb-support: #7B3FE4;
+  --fb-chart-3: #7B3FE4;
+}
+[data-support="violet"][data-theme="paper"] {
+  --fb-support: #7B3FE4;
+  --fb-chart-3: #7B3FE4;
+}

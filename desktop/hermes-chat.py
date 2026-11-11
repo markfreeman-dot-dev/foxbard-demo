@@ -20,10 +20,10 @@ HOME = Path.home()
 CONFIG = HOME / '.config/foxbard/neko.json'
 STATE = HOME / '.local/state/foxbard'
 HERMES = HOME / '.local/bin/hermes'
-HELP = ('Type a request here to talk to Hermes and control this shared KDE desktop. '
+HELP = ('Type a request here to talk to Foxbard and control this shared KDE desktop. '
         'Commands: /status, /stop, /new, /approve, /deny. '
         'Everyone in this room can see requests and replies.')
-CONTEXT = ('You are Hermes, assisting visitors through Neko chat on their shared KDE desktop. '
+CONTEXT = ('You are Foxbard, assisting visitors through chat on a shared KDE desktop. '
            'Use computer_use for visible desktop interaction; DISPLAY=:99.0 is the screen they see. '
            'Use terminal and file tools for development tasks when useful. '
            'Do not start a separate desktop or stop Neko, Xorg, or the chat bridge. '
@@ -156,9 +156,9 @@ class Bridge:
                 if result and result.get('text'):
                     await self.say(result['text'])
                 elif self.process.returncode:
-                    await self.say('Hermes could not complete this request. Check ~/.local/state/foxbard/agent.log in Konsole for the cause. Use hermes model to check your OpenRouter configuration, or /new if a previous session cannot resume.')
+                    await self.say('Foxbard could not complete this request. Check ~/.local/state/foxbard/agent.log in Konsole for the cause. Use hermes model to check your OpenRouter configuration, or /new if a previous session cannot resume.')
                 else:
-                    await self.say('Hermes finished without a text reply. Check the desktop for changes.')
+                    await self.say('Foxbard finished without a text reply. Check the desktop for changes.')
         except asyncio.CancelledError:
             raise
         except TimeoutError:
@@ -180,7 +180,7 @@ class Bridge:
         labels = ['Allow once', 'Deny'] if question['type'] == 'approval' else question.get('choices', [])
         labels = [str(item.get('label') or item.get('text') or item.get('value') or '') if isinstance(item, dict) else str(item) for item in labels]
         question['choices'] = labels
-        await self.say(question.get('text') or 'Hermes needs your input.')
+        await self.say(question.get('text') or 'Foxbard needs your input.')
         if labels:
             await self.say('\n'.join(f'{i + 1}. {label}' for i, label in enumerate(labels)))
         metadata = {'id': question['id'], 'kind': question['type'], 'choices': [label[:40] for label in labels[:6]]}
@@ -226,7 +226,7 @@ class Bridge:
         self.process.stdin.write((json.dumps(payload) + '\n').encode())
         await self.process.stdin.drain()
         self.pending = self.questions.pop(0) if self.questions else None
-        await self.say('Response sent to Hermes.')
+        await self.say('Response sent to Foxbard.')
         if self.pending:
             await self.show_question()
 
@@ -255,7 +255,7 @@ class Bridge:
         elif command == 'status':
             status = 'waiting for your response' if self.pending else ('working' if self.task and not self.task.done() else 'idle')
             key = 'OpenRouter key saved' if has_key() else 'OpenRouter key missing; run foxbard-openrouter in Konsole'
-            await self.say(f'Hermes is {status}; {key}. Desktop: KDE :99.0.')
+            await self.say(f'Foxbard is {status}; {key}. Desktop: KDE :99.0.')
             await self.show_question()
         elif command == 'stop':
             stopped = await self.stop()
