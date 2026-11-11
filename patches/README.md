@@ -49,7 +49,7 @@ Build from a Neko source checkout without modifying that checkout:
 node scripts/build-chat-ui.mjs /path/to/neko-source /tmp/foxbard-chat-ui.tgz
 ```
 
-The script creates a temporary checkout, applies both patches, copies the local design assets and icons, installs dependencies, runs the client tests, and builds the archive. It includes the upstream license and attribution in `licenses/`.
+The script creates a temporary checkout, applies the chat, design, and model-selector patches, copies the local design assets and icons, installs dependencies, runs the client tests, and builds the archive. It includes the upstream license and attribution in `licenses/`.
 
 Install the client and native desktop appearance separately from the entry-page deployment:
 
@@ -58,8 +58,14 @@ node --env-file=.env.local scripts/install-chat-ui.mjs /tmp/foxbard-chat-ui.tgz
 node --env-file=.env.local scripts/install-design.mjs
 ```
 
-The appearance installer adds the KDE color scheme, Plasma theme, fonts, and ink wallpaper with a small fox mark. It relabels the existing assistant launcher without changing its command. Appearance changes apply at the next desktop login; window positions and panel widgets are retained. Run `/opt/foxbard/design/apply.sh` from the desktop session to apply them immediately.
+The appearance installer adds the KDE color scheme, Plasma theme, fonts, and paper wallpaper with a small ink fox mark. It relabels the existing assistant launcher without changing its command. Appearance changes apply at the next desktop login; window positions and panel widgets are retained. Run `/opt/foxbard/design/apply.sh` from the desktop session to apply them immediately.
 
 The bridge's updated display text is in `desktop/hermes-chat.py`, and the gateway's reconnect strip is styled in `desktop/gateway.mjs`. Install those service files during a maintenance window using the existing service deployment workflow. The frontend patch remains compatible with the previous bridge text.
 
-Validation for this update: 115 client tests, two gateway tests, and 11 bridge tests passed; the production client build passed. Browser checks covered widths of 320, 390, 768, 1280, and 1440 pixels, selected-choice styling, unchanged choice and typed-answer payloads, slash commands, the About dialog, and the emoji picker. Browser interaction checks used a simulated desktop transport. The native theme installer has not yet been run on the shared desktop.
+Validation for this update: 115 client tests, two gateway tests, and 11 bridge tests passed; the production client build passed. Browser checks covered widths of 320, 390, 768, 1280, and 1440 pixels, selected-choice styling, unchanged choice and typed-answer payloads, slash commands, the About dialog, and the emoji picker. Browser interaction checks used a simulated desktop transport. The paper theme is installed on the shared desktop.
+
+## Model and effort selectors
+
+`neko-model-selectors.patch` applies after the design patch. It loads the account's model catalog from the authenticated desktop, remembers each browser's choice, and sends model and effort metadata with the next request. Question answers retain their existing protocol. The bridge validates choices against the server catalog before Hermes applies them to the current conversation.
+
+The desktop uses the paper palette while the browser chat stays dark. The selector update passed 117 client tests and a production build; 15 bridge tests cover credentials, model selection, session migration, and existing chat controls.

@@ -62,4 +62,4 @@ See [Vercel's Git integration](https://vercel.com/docs/git) and [Deployment Chec
 
 ## Secrets
 
-Keep `.env*`, `.vercel/`, API keys, session cookies, and gateway configuration out of Git. Production environment variables remain in Vercel. Do not copy them into GitHub Actions or preview deployments just to make a test pass. Enter or update the OpenRouter key privately inside the desktop.
+Keep `.env*`, `.vercel/`, API keys, session cookies, and gateway configuration out of Git. Production environment variables remain in Vercel. Do not copy them into GitHub Actions or preview deployments just to make a test pass. Complete ChatGPT subscription sign-in privately through Hermes. Keep its OAuth credentials out of the repository.

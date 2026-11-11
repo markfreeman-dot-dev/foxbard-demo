@@ -39,7 +39,7 @@ for directory in [Path('/home/neko/Desktop'), Path('/home/neko/.local/share/appl
     path = directory / 'Hermes.desktop'
     if path.exists():
         lines = path.read_text().splitlines()
-        replacements = {'Name': 'Foxbard', 'Comment': 'Chat with Foxbard in a terminal', 'Icon': '/opt/foxbard/design/logo/mark-white.svg'}
+        replacements = {'Name': 'Foxbard', 'Comment': 'Chat with Foxbard in a terminal', 'Icon': '/opt/foxbard/design/logo/mark-ink.svg'}
         path.write_text('\\n'.join(key + '=' + replacements[key] if (key := line.split('=', 1)[0]) in replacements else line for line in lines) + '\\n')
 PY
 printf '%s\\n' 'Foxbard desktop appearance installed. It applies at the next desktop login.'

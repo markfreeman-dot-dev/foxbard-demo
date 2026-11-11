@@ -17,14 +17,14 @@ await new Promise((resolve, reject) => {
 });
 const ws = new WebSocket(visitor.base.replace('https:', 'wss:') + '/api/ws', { headers: { cookie: visitor.cookie, origin: visitor.base } });
 await new Promise((resolve, reject) => {
-  const timer = setTimeout(() => { ws.terminate(); reject(Error('Hermes did not answer its status command.')); }, 15000);
+  const timer = setTimeout(() => { ws.terminate(); reject(Error('Foxbard did not answer its status command.')); }, 15000);
   ws.on('error', reject);
   ws.on('message', raw => {
     const event = JSON.parse(raw);
     if (event.event === 'system/init') ws.send(JSON.stringify({ event: 'chat/message', payload: { text: '/status' } }));
     if (event.event === 'system/heartbeat') ws.send(JSON.stringify({ event: 'client/heartbeat' }));
-    if (event.event === 'chat/message' && event.payload?.content?.text?.includes('OpenRouter key saved')) {
-      clearTimeout(timer); console.log('Hermes chat is connected and its OpenRouter key is saved.'); resolve();
+    if (event.event === 'chat/message' && event.payload?.content?.text?.includes('OpenAI subscription credentials saved')) {
+      clearTimeout(timer); console.log('Foxbard chat is connected and its OpenAI subscription credentials are saved.'); resolve();
     }
   });
 });
@@ -33,4 +33,4 @@ await fetch(visitor.base + '/gate/logout', { headers: { cookie: visitor.cookie }
 assert.equal((await fetch(visitor.base + '/api/whoami', { headers: { cookie: visitor.cookie } })).status, 401);
 const logout = await entryRequest('/api/auth', { cookie: visitor.entryCookie, body: { action: 'logout' } });
 assert.equal(logout.status, 200); assert.match(logout.headers.get('set-cookie'), /Max-Age=0/);
-console.log('Production resume, 15-minute idle configuration, direct WebSocket rejection, Hermes status, and logout passed.');
+console.log('Production resume, 15-minute idle configuration, direct WebSocket rejection, Foxbard status, and logout passed.');
